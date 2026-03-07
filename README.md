@@ -59,7 +59,7 @@ uv sync
 cd <your-agent-project>/skills/
 
 # 克隆项目
-git clone https://github.com/anthropics/xiaohongshu-skills.git
+git clone https://github.com/autoclaw-cc/xiaohongshu-skills.git
 cd xiaohongshu-skills
 
 # 安装依赖
