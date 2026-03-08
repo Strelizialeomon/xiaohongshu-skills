@@ -29,6 +29,13 @@ metadata:
 - **禁止外部工具**：不得调用 MCP 工具（`use_mcp_tool` 等）、Go 命令行工具，或任何非本项目的实现。
 - **完成即止**：登录流程结束后，直接告知结果，等待用户下一步指令，不主动触发其他功能。
 
+**以下行为严格禁止：**
+
+- ❌ **禁止手动启动浏览器**：不得运行 `chromium-browser --headless ...` 或任何直接启动 Chrome 的命令。`cli.py` 内部会自动启动和管理 Chrome。
+- ❌ **禁止手动安装依赖**：不得运行 `pip install`、`source .venv/bin/activate` 等。依赖通过 `uv sync` 管理。
+- ❌ **禁止发明 CLI 参数**：`cli.py` 不支持 `--no-sandbox`、`--browser-path`、`--headless` 等参数。只使用下表中列出的子命令和参数。
+- ❌ **禁止自行排查 Chrome 问题**：遇到 Chrome 启动失败时，直接将错误信息告知用户，不得自行尝试修复。
+
 **本技能允许使用的全部 CLI 子命令：**
 
 | 子命令 | 用途 |
