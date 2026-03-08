@@ -111,15 +111,17 @@ uv run python scripts/cli.py get-qrcode
 
 - Chrome 正常启动（无界面环境自动使用 headless 模式），从登录弹窗 `img` 元素读取二维码。
 - 命令立即退出，Chrome tab 保持打开（QR 会话继续有效）。
-- 输出：`{"qrcode_path": "/tmp/xhs/login_qrcode.png", "qrcode_data_url": "data:image/png;base64,...", "message": "..."}`
+- 输出：`{"qrcode_path": "/tmp/xhs/login_qrcode.png", "display_markdown_file": "/tmp/xhs/login_qrcode_display.md", "message": "..."}`
 
-> **无界面服务器（headless）说明**：在无 GUI 的 Linux 服务器上，`get-qrcode` 会自动以 headless 模式启动 Chromium。二维码通过 `qrcode_data_url`（base64 data URL）返回，直接以 Markdown 图片语法内嵌到对话窗口即可，无需用户在浏览器中查看。
+> **无界面服务器（headless）说明**：在无 GUI 的 Linux 服务器上，`get-qrcode` 会自动以 headless 模式启动 Chromium。二维码通过 `display_markdown_file` 指向的文件返回。
 
-**第二步** — 从 JSON 取 `qrcode_data_url`，在回复中直接写出：
+**第二步** — 从 JSON 取 `display_markdown_file` 路径，**读取文件内容并原样输出**到回复中：
 
+```bash
+cat {display_markdown_file 的路径}
 ```
-![小红书登录二维码]({qrcode_data_url})
-```
+
+⚠️ **文件内容是一段完整的 Markdown 图片语法（`![...](data:image/png;base64,...)`），必须将 `cat` 输出的内容原样完整输出到回复中，不得截断或省略任何字符。这样用户就能在对话窗口看到二维码图片。**
 
 图片内嵌在对话窗口，用户用小红书 App 扫对话里的二维码。
 

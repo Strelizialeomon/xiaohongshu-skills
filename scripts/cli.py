@@ -365,7 +365,13 @@ def cmd_get_qrcode(args: argparse.Namespace) -> None:
         return
 
     qrcode_path = save_qrcode_to_file(png_bytes)
+
+    # 将 data URL 和展示用 Markdown 写入文件，避免巨大 base64 字符串淹没 Agent 的 stdout
     data_url = "data:image/png;base64," + base64.b64encode(png_bytes).decode()
+    display_md = f"![小红书登录二维码]({data_url})"
+    display_md_file = qrcode_path.replace(".png", "_display.md")
+    with open(display_md_file, "w") as f:
+        f.write(display_md)
 
     # 记录 login tab，供 wait-login 精确 reconnect
     _save_login_tab(page.target_id, args.port)
@@ -376,7 +382,7 @@ def cmd_get_qrcode(args: argparse.Namespace) -> None:
     browser.close()
     _output({
         "qrcode_path": qrcode_path,
-        "qrcode_data_url": data_url,
+        "display_markdown_file": display_md_file,
         "message": "二维码已生成，请扫码登录。扫码后运行 wait-login 等待登录结果。",
     })
 
