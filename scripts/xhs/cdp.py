@@ -572,9 +572,20 @@ class Browser:
         self.base_url = f"http://{host}:{port}"
         self._cdp: CDPClient | None = None
 
+    @staticmethod
+    def _local_get(url: str, timeout: float = 5) -> requests.Response:
+        """向本地 Chrome DevTools 发起 HTTP 请求，完全绕过系统代理。
+
+        proxies={"http": None} 无法绕过 SOCKS 代理（ALL_PROXY），
+        必须用 trust_env=False 的 Session 才能彻底忽略代理环境变量。
+        """
+        s = requests.Session()
+        s.trust_env = False
+        return s.get(url, timeout=timeout)
+
     def connect(self) -> None:
         """连接到 Chrome DevTools。"""
-        resp = requests.get(f"{self.base_url}/json/version", timeout=5, proxies={"http": None, "https": None})
+        resp = self._local_get(f"{self.base_url}/json/version")
         resp.raise_for_status()
         info = resp.json()
         ws_url = info["webSocketDebuggerUrl"]
@@ -635,7 +646,7 @@ class Browser:
 
         import contextlib
 
-        resp = requests.get(f"{self.base_url}/json", timeout=5, proxies={"http": None, "https": None})
+        resp = self._local_get(f"{self.base_url}/json")
         targets = resp.json()
 
         for target in targets:
@@ -685,7 +696,7 @@ class Browser:
             self.connect()
         assert self._cdp is not None
 
-        resp = requests.get(f"{self.base_url}/json", timeout=5, proxies={"http": None, "https": None})
+        resp = self._local_get(f"{self.base_url}/json")
         targets = resp.json()
 
         for target in targets:

@@ -195,7 +195,9 @@ def kill_chrome(port: int = DEFAULT_PORT) -> None:
     try:
         import requests
 
-        resp = requests.get(f"http://127.0.0.1:{port}/json/version", timeout=2, proxies={"http": None, "https": None})
+        s = requests.Session()
+        s.trust_env = False
+        resp = s.get(f"http://127.0.0.1:{port}/json/version", timeout=2)
         if resp.status_code == 200:
             ws_url = resp.json().get("webSocketDebuggerUrl")
             if ws_url:
