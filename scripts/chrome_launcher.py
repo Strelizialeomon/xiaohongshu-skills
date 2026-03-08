@@ -147,17 +147,29 @@ def launch_chrome(
     if headless:
         args.append("--headless=new")
 
-    # 代理
+    # 代理：只有显式设置 XHS_PROXY 才让 Chrome 走代理。
+    # 必须清除继承的 ALL_PROXY/HTTP_PROXY 等环境变量，否则 Chrome
+    # 会自动使用系统 SOCKS 代理，导致页面加载极慢或超时。
     proxy = os.getenv("XHS_PROXY")
     if proxy:
         args.append(f"--proxy-server={proxy}")
         logger.info("使用代理: %s", _mask_proxy(proxy))
+
+    # 构建干净的环境变量（去除代理相关变量）
+    _PROXY_ENV_KEYS = {
+        "HTTP_PROXY", "http_proxy",
+        "HTTPS_PROXY", "https_proxy",
+        "ALL_PROXY", "all_proxy",
+        "SOCKS_PROXY", "socks_proxy",
+    }
+    clean_env = {k: v for k, v in os.environ.items() if k not in _PROXY_ENV_KEYS}
 
     logger.info("启动 Chrome: port=%d, headless=%s, profile=%s", port, headless, user_data_dir)
     process = subprocess.Popen(
         args,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
+        env=clean_env,
     )
     _chrome_process = process
 

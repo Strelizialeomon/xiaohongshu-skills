@@ -102,13 +102,22 @@ class Page:
         logger.info("导航到: %s", url)
         self._send_session("Page.navigate", {"url": url})
 
-    def wait_for_load(self, timeout: float = 60.0) -> None:
-        """等待页面加载完成（通过轮询 document.readyState）。"""
+    def wait_for_load(self, timeout: float = 30.0, wait_complete: bool = False) -> None:
+        """等待页面加载完成（通过轮询 document.readyState）。
+
+        Args:
+            timeout: 超时时间（秒）。
+            wait_complete: True 等待 'complete'（所有资源加载完毕），
+                           False 等待 'interactive'（DOM 已就绪，够操作页面元素）。
+                           SPA 站点在 headless 模式下可能永远到不了 'complete'，
+                           因此默认只等 'interactive' 以避免无谓等待。
+        """
+        target_states = {"complete"} if wait_complete else {"interactive", "complete"}
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             try:
                 state = self.evaluate("document.readyState")
-                if state == "complete":
+                if state in target_states:
                     return
             except CDPError:
                 pass
