@@ -127,6 +127,8 @@ STEALTH_ARGS = [
     "--disable-infobars",
     "--no-first-run",
     "--no-default-browser-check",
+    "--no-sandbox",
+    "--disable-gpu",
     "--disable-background-timer-throttling",
     "--disable-backgrounding-occluded-windows",
     "--disable-renderer-backgrounding",
