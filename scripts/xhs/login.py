@@ -36,6 +36,20 @@ from .urls import EXPLORE_URL
 logger = logging.getLogger(__name__)
 
 
+def _wait_for_countdown(page: Page, timeout: float = 5.0) -> None:
+    """等待"获取验证码"按钮出现倒计时数字，确认验证码已发送。
+
+    轮询按钮文字直到包含数字（如 "60s"），超时则抛出 RateLimitError。
+    """
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        btn_text = page.get_element_text(GET_CODE_BUTTON) or ""
+        if any(ch.isdigit() for ch in btn_text):
+            return
+        time.sleep(0.3)
+    raise RateLimitError()
+
+
 def _wait_for_auth_ui(page: Page, timeout: float = 8.0) -> None:
     """等待认证 UI 出现，替代固定延迟。
 
@@ -171,20 +185,26 @@ def send_phone_code(page: Page, phone: str) -> bool:
     """
     page.navigate(EXPLORE_URL)
     page.wait_for_load()
-    sleep_random(1500, 2500)
+
+    # 直接等待登录容器出现（合并了 _wait_for_auth_ui 的逻辑，避免重复等待）
+    try:
+        page.wait_for_element(LOGIN_CONTAINER, timeout=10.0)
+    except Exception as exc:
+        # 可能已登录（没有登录容器），检查登录状态
+        if page.has_element(LOGIN_STATUS):
+            return False
+        raise RuntimeError("找不到登录表单") from exc
 
     if page.has_element(LOGIN_STATUS):
         return False
 
-    # 等待登录弹窗出现
-    page.wait_for_element(LOGIN_CONTAINER, timeout=15.0)
-    sleep_random(500, 800)
+    sleep_random(200, 400)
 
     # 点击手机号输入框并逐字输入
     page.click_element(PHONE_INPUT)
     sleep_random(200, 400)
     page.type_text(phone, delay_ms=80)
-    sleep_random(500, 800)
+    sleep_random(200, 400)
 
     # 先勾选用户协议，再点获取验证码
     if not page.has_element(AGREE_CHECKBOX_CHECKED):
@@ -193,12 +213,9 @@ def send_phone_code(page: Page, phone: str) -> bool:
 
     # 点击"获取验证码"
     page.click_element(GET_CODE_BUTTON)
-    sleep_random(2000, 2500)
 
-    # 检测按钮是否变为倒计时（成功发送后按钮文字会包含数字秒数）
-    btn_text = page.get_element_text(GET_CODE_BUTTON) or ""
-    if not any(ch.isdigit() for ch in btn_text):
-        raise RateLimitError()
+    # 事件驱动：轮询按钮文字直到出现倒计时数字，替代固定 2-2.5s 等待
+    _wait_for_countdown(page)
 
     logger.info("验证码已发送至 %s", phone[:3] + "****" + phone[-4:])
     return True
@@ -214,9 +231,9 @@ def submit_phone_code(page: Page, code: str) -> bool:
     Returns:
         True 登录成功，False 失败（超时或验证码错误）。
     """
-    # 点击验证码输入框，先清空已有内容（防止重试时追加导致验证码错误），再逐字输入
+    # 点击验证码输入框，先清空再用 CDP 键盘事件逐字输入（isTrusted=true，React 能识别）
     page.click_element(CODE_INPUT)
-    sleep_random(300, 500)
+    sleep_random(100, 200)
     page.evaluate(
         f"""(() => {{
             const el = document.querySelector({json.dumps(CODE_INPUT)});
@@ -229,12 +246,12 @@ def submit_phone_code(page: Page, code: str) -> bool:
             }}
         }})()"""
     )
-    page.type_text(code, delay_ms=100)
-    sleep_random(500, 800)
+    page.type_text(code, delay_ms=0)
+    sleep_random(100, 200)
 
     # 点击登录按钮
     page.click_element(PHONE_LOGIN_SUBMIT)
-    sleep_random(1000, 2000)
+    sleep_random(500, 1000)
 
     # 检查是否有错误提示
     err = page.get_element_text(LOGIN_ERR_MSG)

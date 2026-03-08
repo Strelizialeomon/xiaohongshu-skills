@@ -339,7 +339,7 @@ def cmd_phone_login(args: argparse.Namespace) -> None:
             exit_code=0 if success else 2,
         )
     finally:
-        browser.close_page(page)
+        # 不关闭 tab——与 verify-code 一致，保留页面供重试
         browser.close()
 
 
