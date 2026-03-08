@@ -592,14 +592,24 @@ class Browser:
         s.trust_env = False
         return s.get(url, timeout=timeout)
 
-    def connect(self) -> None:
-        """连接到 Chrome DevTools。"""
-        resp = self._local_get(f"{self.base_url}/json/version")
-        resp.raise_for_status()
-        info = resp.json()
-        ws_url = info["webSocketDebuggerUrl"]
-        logger.info("连接到 Chrome: %s", ws_url)
-        self._cdp = CDPClient(ws_url)
+    def connect(self, retries: int = 3) -> None:
+        """连接到 Chrome DevTools（带重试，应对 Chrome 冷启动）。"""
+        last_err: Exception | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                resp = self._local_get(f"{self.base_url}/json/version")
+                resp.raise_for_status()
+                info = resp.json()
+                ws_url = info["webSocketDebuggerUrl"]
+                logger.info("连接到 Chrome: %s", ws_url)
+                self._cdp = CDPClient(ws_url)
+                return
+            except Exception as e:
+                last_err = e
+                if attempt < retries:
+                    logger.warning("连接 Chrome 失败 (第 %d 次)，%d 秒后重试: %s", attempt, 2, e)
+                    time.sleep(2)
+        raise last_err  # type: ignore[misc]
 
     def _setup_page(self, page: Page) -> Page:
         """为 Page 对象注入 stealth、UA、viewport，并启用必要的 CDP domain。"""
