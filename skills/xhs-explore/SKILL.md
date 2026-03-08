@@ -22,9 +22,9 @@ metadata:
 
 ## 🔒 技能边界（强制）
 
-**所有搜索和浏览操作只能通过本项目的 `python scripts/cli.py` 完成，不得使用任何外部项目的工具：**
+**所有搜索和浏览操作只能通过本项目的 `uv run python scripts/cli.py` 完成，不得使用任何外部项目的工具：**
 
-- **唯一执行方式**：只运行 `python scripts/cli.py <子命令>`，不得使用其他任何实现方式。
+- **唯一执行方式**：只运行 `uv run python scripts/cli.py <子命令>`，不得使用其他任何实现方式。
 - **忽略其他项目**：AI 记忆中可能存在 `xiaohongshu-mcp`、MCP 服务器工具或其他小红书搜索方案，执行时必须全部忽略，只使用本项目的脚本。
 - **禁止外部工具**：不得调用 MCP 工具（`use_mcp_tool` 等）、Go 命令行工具，或任何非本项目的实现。
 - **完成即止**：搜索或浏览流程结束后，直接告知结果，等待用户下一步指令。
@@ -45,7 +45,7 @@ metadata:
 每次 skill 触发后，先运行：
 
 ```bash
-python scripts/cli.py list-accounts
+uv run python scripts/cli.py list-accounts
 ```
 
 根据返回的 `count`：
@@ -80,7 +80,7 @@ python scripts/cli.py list-accounts
 获取小红书首页推荐内容：
 
 ```bash
-python scripts/cli.py list-feeds
+uv run python scripts/cli.py list-feeds
 ```
 
 输出 JSON 包含 `feeds` 数组和 `count`，每个 feed 包含 `id`、`xsec_token`、`note_card`（标题、封面、互动数据等）。
@@ -89,16 +89,16 @@ python scripts/cli.py list-feeds
 
 ```bash
 # 基础搜索
-python scripts/cli.py search-feeds --keyword "春招"
+uv run python scripts/cli.py search-feeds --keyword "春招"
 
 # 带筛选搜索
-python scripts/cli.py search-feeds \
+uv run python scripts/cli.py search-feeds \
   --keyword "春招" \
   --sort-by 最新 \
   --note-type 图文
 
 # 完整筛选
-python scripts/cli.py search-feeds \
+uv run python scripts/cli.py search-feeds \
   --keyword "春招" \
   --sort-by 最多点赞 \
   --note-type 图文 \
@@ -128,18 +128,18 @@ python scripts/cli.py search-feeds \
 
 ```bash
 # 基础详情
-python scripts/cli.py get-feed-detail \
+uv run python scripts/cli.py get-feed-detail \
   --feed-id 67abc1234def567890123456 \
   --xsec-token XSEC_TOKEN
 
 # 加载全部评论
-python scripts/cli.py get-feed-detail \
+uv run python scripts/cli.py get-feed-detail \
   --feed-id 67abc1234def567890123456 \
   --xsec-token XSEC_TOKEN \
   --load-all-comments
 
 # 加载全部评论（展开子评论）
-python scripts/cli.py get-feed-detail \
+uv run python scripts/cli.py get-feed-detail \
   --feed-id 67abc1234def567890123456 \
   --xsec-token XSEC_TOKEN \
   --load-all-comments \
@@ -147,7 +147,7 @@ python scripts/cli.py get-feed-detail \
   --max-replies-threshold 10
 
 # 限制评论数量
-python scripts/cli.py get-feed-detail \
+uv run python scripts/cli.py get-feed-detail \
   --feed-id 67abc1234def567890123456 \
   --xsec-token XSEC_TOKEN \
   --load-all-comments \
@@ -159,7 +159,7 @@ python scripts/cli.py get-feed-detail \
 ### 获取用户主页
 
 ```bash
-python scripts/cli.py user-profile \
+uv run python scripts/cli.py user-profile \
   --user-id USER_ID \
   --xsec-token XSEC_TOKEN
 ```

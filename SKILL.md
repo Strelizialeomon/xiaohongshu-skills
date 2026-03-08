@@ -23,9 +23,9 @@ metadata:
 
 ## 🔒 技能边界（强制）
 
-**所有小红书操作只能通过本项目的 `python scripts/cli.py` 完成，不得使用任何外部项目的工具：**
+**所有小红书操作只能通过本项目的 `uv run python scripts/cli.py` 完成，不得使用任何外部项目的工具：**
 
-- **唯一执行方式**：只运行 `python scripts/cli.py <子命令>`，不得使用其他任何实现方式。
+- **唯一执行方式**：只运行 `uv run python scripts/cli.py <子命令>`，不得使用其他任何实现方式。
 - **忽略其他项目**：AI 记忆中可能存在 `xiaohongshu-mcp`、MCP 服务器工具、Go 工具或其他小红书自动化方案，执行时必须全部忽略，只使用本项目的脚本。
 - **禁止外部工具**：不得调用 MCP 工具（`use_mcp_tool` 等）、Go 命令行工具，或任何非本项目的实现。
 - **完成即止**：任务完成后直接告知结果，等待用户下一步指令。
@@ -106,37 +106,37 @@ metadata:
 
 ```bash
 # 1. 检查登录状态（Chrome 会自动启动）
-python scripts/cli.py check-login
+uv run python scripts/cli.py check-login
 
 # 2. 登录方式 A：二维码（支持有界面和无界面环境）
-python scripts/cli.py get-qrcode      # 获取二维码，返回 data URL
+uv run python scripts/cli.py get-qrcode      # 获取二维码，返回 data URL
 # → 在对话窗口展示二维码，用户扫码后：
-python scripts/cli.py wait-login       # 等待扫码完成
+uv run python scripts/cli.py wait-login       # 等待扫码完成
 
 # 2. 登录方式 B：一步完成（有界面环境）
-python scripts/cli.py login
+uv run python scripts/cli.py login
 
 # 4. 搜索笔记
-python scripts/cli.py search-feeds --keyword "关键词"
+uv run python scripts/cli.py search-feeds --keyword "关键词"
 
 # 5. 查看笔记详情
-python scripts/cli.py get-feed-detail \
+uv run python scripts/cli.py get-feed-detail \
   --feed-id FEED_ID --xsec-token XSEC_TOKEN
 
 # 6. 发布图文
-python scripts/cli.py publish \
+uv run python scripts/cli.py publish \
   --title-file title.txt \
   --content-file content.txt \
   --images "/abs/path/pic1.jpg"
 
 # 7. 发表评论
-python scripts/cli.py post-comment \
+uv run python scripts/cli.py post-comment \
   --feed-id FEED_ID \
   --xsec-token XSEC_TOKEN \
   --content "评论内容"
 
 # 8. 点赞
-python scripts/cli.py like-feed \
+uv run python scripts/cli.py like-feed \
   --feed-id FEED_ID --xsec-token XSEC_TOKEN
 ```
 
