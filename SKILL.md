@@ -44,7 +44,7 @@ metadata:
 
 ## 全局约束
 
-- 所有操作前应确认登录状态（通过 `check-login`）。
+- 首次操作前建议检查登录状态（通过 `check-login`），但各子命令内部已自带登录检测，无需每次都手动 check。
 - 发布和评论操作必须经过用户确认后才能执行。
 - 文件路径必须使用绝对路径。
 - CLI 输出为 JSON 格式，结构化呈现给用户。
@@ -59,7 +59,7 @@ metadata:
 | 命令 | 功能 |
 |------|------|
 | `cli.py check-login` | 检查登录状态，返回推荐登录方式 |
-| `cli.py get-qrcode` | 获取登录二维码（非阻塞，返回 data URL 和文件路径） |
+| `cli.py get-qrcode` | 获取登录二维码（非阻塞，返回文件路径） |
 | `cli.py wait-login` | 等待扫码完成（阻塞，默认 120s） |
 | `cli.py login` | 二维码登录（获取+等待一步完成） |
 | `cli.py send-code --phone <号码>` | 手机登录第一步：发送验证码 |
@@ -109,11 +109,11 @@ metadata:
 uv run python scripts/cli.py check-login
 
 # 2. 登录方式 A：二维码（支持有界面和无界面环境）
-uv run python scripts/cli.py get-qrcode      # 获取二维码，返回 data URL
+uv run python scripts/cli.py get-qrcode      # 获取二维码，返回文件路径
 # → 在对话窗口展示二维码，用户扫码后：
 uv run python scripts/cli.py wait-login       # 等待扫码完成
 
-# 2. 登录方式 B：一步完成（有界面环境）
+# 3. 登录方式 B：一步完成（有界面环境）
 uv run python scripts/cli.py login
 
 # 4. 搜索笔记
@@ -143,6 +143,6 @@ uv run python scripts/cli.py like-feed \
 ## 失败处理
 
 - **未登录**：提示用户执行登录流程（xhs-auth）。
-- **Chrome 未启动**：使用 `chrome_launcher.py` 启动浏览器。
+- **Chrome 未启动**：CLI 脚本会自动启动 Chrome，无需手动干预。若启动失败，将错误信息告知用户。
 - **操作超时**：检查网络连接，适当增加等待时间。
 - **频率限制**：降低操作频率，增大间隔。

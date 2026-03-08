@@ -38,6 +38,7 @@ metadata:
 | `publish` | 图文一步发布 |
 | `publish-video` | 视频一步发布 |
 | `click-publish` | 点击发布按钮 |
+| `save-draft` | 保存为草稿 |
 | `long-article` | 填写长文内容并触发排版 |
 | `select-template` | 选择长文排版模板 |
 | `next-step` | 进入长文发布页并填写描述 |

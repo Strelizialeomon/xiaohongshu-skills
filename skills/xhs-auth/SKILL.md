@@ -43,6 +43,7 @@ metadata:
 | `check-login` | 检查当前登录状态 |
 | `get-qrcode` | 获取二维码图片（非阻塞） |
 | `wait-login` | 等待扫码完成（阻塞） |
+| `login` | 二维码登录（获取+等待一步完成） |
 | `send-code --phone` | 发送手机验证码 |
 | `verify-code --code` | 提交验证码完成登录 |
 | `delete-cookies` | 退出登录并清除 cookies |
@@ -211,4 +212,4 @@ uv run python scripts/cli.py remove-account --name personal     # 删除账号
 - **登录弹窗未出现**：等待 15 秒超时，重试 `send-code`。
 - **验证码错误**：输出包含 `"logged_in": false`，重新运行 `verify-code --code <新验证码>`。
 - **二维码超时**：重新执行 `get-qrcode` 获取新二维码，再运行 `wait-login`。
-- **远程 CDP 连接失败**：检查 Chrome 是否已开启 `--remote-debugging-port`。
+- **连接失败 / 超时**：脚本内部已有重试机制，若仍失败，将错误信息告知用户即可。
