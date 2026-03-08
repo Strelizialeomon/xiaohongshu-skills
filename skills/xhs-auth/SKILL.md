@@ -102,9 +102,11 @@ python scripts/cli.py check-login
 python scripts/cli.py get-qrcode
 ```
 
-- Chrome 正常启动，从登录弹窗 `img` 元素读取二维码（相当于右键另存为）。
+- Chrome 正常启动（无界面环境自动使用 headless 模式），从登录弹窗 `img` 元素读取二维码。
 - 命令立即退出，Chrome tab 保持打开（QR 会话继续有效）。
-- 输出：`{"qrcode_path": "...", "qrcode_data_url": "data:image/png;base64,...", "message": "..."}`
+- 输出：`{"qrcode_path": "/tmp/xhs/login_qrcode.png", "qrcode_data_url": "data:image/png;base64,...", "message": "..."}`
+
+> **无界面服务器（headless）说明**：在无 GUI 的 Linux 服务器上，`get-qrcode` 会自动以 headless 模式启动 Chromium。二维码通过 `qrcode_data_url`（base64 data URL）返回，直接以 Markdown 图片语法内嵌到对话窗口即可，无需用户在浏览器中查看。
 
 **第二步** — 从 JSON 取 `qrcode_data_url`，在回复中直接写出：
 

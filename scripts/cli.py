@@ -351,6 +351,8 @@ def cmd_get_qrcode(args: argparse.Namespace) -> None:
     调用方收到 qrcode_data_url 后直接内嵌到对话窗口显示；同时浏览器窗口（GUI 环境）
     也会显示二维码，用户可选择扫任意一个。
     """
+    import base64
+
     from xhs.login import fetch_qrcode, save_qrcode_to_file
 
     browser, page = _connect(args)
@@ -363,6 +365,7 @@ def cmd_get_qrcode(args: argparse.Namespace) -> None:
         return
 
     qrcode_path = save_qrcode_to_file(png_bytes)
+    data_url = "data:image/png;base64," + base64.b64encode(png_bytes).decode()
 
     # 记录 login tab，供 wait-login 精确 reconnect
     _save_login_tab(page.target_id, args.port)
@@ -373,7 +376,8 @@ def cmd_get_qrcode(args: argparse.Namespace) -> None:
     browser.close()
     _output({
         "qrcode_path": qrcode_path,
-        "message": "二维码已生成，请扫码登录。扫码后运行 check-login 确认登录状态。",
+        "qrcode_data_url": data_url,
+        "message": "二维码已生成，请扫码登录。扫码后运行 wait-login 等待登录结果。",
     })
 
 

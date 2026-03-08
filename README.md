@@ -109,9 +109,16 @@ python scripts/chrome_launcher.py --headless
 # 检查登录状态（已登录时返回用户昵称和小红书号）
 python scripts/cli.py check-login
 
-# 扫码登录
+# 方式 A：二维码登录（推荐，支持有界面和无界面环境）
+python scripts/cli.py get-qrcode       # 获取二维码（非阻塞，返回 data URL 和文件路径）
+# → 将 qrcode_data_url 展示给用户扫码
+python scripts/cli.py wait-login        # 等待扫码完成（阻塞，最多 120s）
+
+# 方式 B：一步完成扫码登录（有界面环境）
 python scripts/cli.py login
 ```
+
+> **💡 无界面服务器登录**：在无 GUI 的 Linux 服务器上，`get-qrcode` 会自动以 headless 模式启动 Chromium，并在 JSON 输出中返回 `qrcode_data_url`（base64 data URL）。Agent / 聊天机器人可直接将其嵌入对话窗口显示给用户扫码。
 
 #### 3. 搜索笔记
 
@@ -186,7 +193,11 @@ python scripts/cli.py favorite-feed \
 | 子命令 | 说明 |
 |--------|------|
 | `check-login` | 检查登录状态，返回用户昵称和小红书号 |
-| `login` | 获取登录二维码，等待扫码，登录后返回用户信息 |
+| `get-qrcode` | 获取登录二维码（非阻塞，返回 data URL 和文件路径） |
+| `wait-login` | 等待扫码完成（阻塞，默认 120s） |
+| `login` | 获取登录二维码 + 等待扫码（一步完成） |
+| `send-code` | 发送手机验证码（无界面服务器备用方案） |
+| `verify-code` | 提交验证码完成登录 |
 | `delete-cookies` | 清除 cookies（退出/切换账号） |
 | `list-feeds` | 获取首页推荐 Feed |
 | `search-feeds` | 关键词搜索笔记（支持排序/类型/时间/范围/位置筛选） |

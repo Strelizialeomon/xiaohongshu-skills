@@ -59,7 +59,9 @@ metadata:
 | 命令 | 功能 |
 |------|------|
 | `cli.py check-login` | 检查登录状态，返回推荐登录方式 |
-| `cli.py login` | 二维码登录（有界面环境） |
+| `cli.py get-qrcode` | 获取登录二维码（非阻塞，返回 data URL 和文件路径） |
+| `cli.py wait-login` | 等待扫码完成（阻塞，默认 120s） |
+| `cli.py login` | 二维码登录（获取+等待一步完成） |
 | `cli.py send-code --phone <号码>` | 手机登录第一步：发送验证码 |
 | `cli.py verify-code --code <验证码>` | 手机登录第二步：提交验证码 |
 | `cli.py delete-cookies` | 清除 cookies（退出/切换账号） |
@@ -103,13 +105,15 @@ metadata:
 ## 快速开始
 
 ```bash
-# 1. 启动 Chrome
-python scripts/chrome_launcher.py
-
-# 2. 检查登录状态
+# 1. 检查登录状态（Chrome 会自动启动）
 python scripts/cli.py check-login
 
-# 3. 登录（如需要）
+# 2. 登录方式 A：二维码（支持有界面和无界面环境）
+python scripts/cli.py get-qrcode      # 获取二维码，返回 data URL
+# → 在对话窗口展示二维码，用户扫码后：
+python scripts/cli.py wait-login       # 等待扫码完成
+
+# 2. 登录方式 B：一步完成（有界面环境）
 python scripts/cli.py login
 
 # 4. 搜索笔记
