@@ -574,7 +574,7 @@ class Browser:
 
     def connect(self) -> None:
         """连接到 Chrome DevTools。"""
-        resp = requests.get(f"{self.base_url}/json/version", timeout=5)
+        resp = requests.get(f"{self.base_url}/json/version", timeout=5, proxies={"http": None, "https": None})
         resp.raise_for_status()
         info = resp.json()
         ws_url = info["webSocketDebuggerUrl"]
@@ -635,7 +635,7 @@ class Browser:
 
         import contextlib
 
-        resp = requests.get(f"{self.base_url}/json", timeout=5)
+        resp = requests.get(f"{self.base_url}/json", timeout=5, proxies={"http": None, "https": None})
         targets = resp.json()
 
         for target in targets:
@@ -685,7 +685,7 @@ class Browser:
             self.connect()
         assert self._cdp is not None
 
-        resp = requests.get(f"{self.base_url}/json", timeout=5)
+        resp = requests.get(f"{self.base_url}/json", timeout=5, proxies={"http": None, "https": None})
         targets = resp.json()
 
         for target in targets:
